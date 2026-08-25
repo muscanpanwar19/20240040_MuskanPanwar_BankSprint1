@@ -1,11 +1,10 @@
 namespace _20240040_MuskanPanwar_BankSprint1
 {
-    // Omni Account: Interest on balance > $1000, overdraft allowed, fee on failed transactions
     public class OmniAccount : Account
     {
         private decimal interestRate;
         private decimal overdraftLimit;
-        private decimal failedFee = 10.00m; // Fixed fee for failed transaction
+        private decimal failedFee = 10.00m; 
 
         public decimal InterestRate
         {
@@ -52,7 +51,6 @@ namespace _20240040_MuskanPanwar_BankSprint1
             }
         }
 
-        // Interest calculation only on balance exceeding $1,000
         public override decimal CalculateInterest()
         {
             if (balance > 1000)

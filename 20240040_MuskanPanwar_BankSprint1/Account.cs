@@ -55,7 +55,7 @@ namespace _20240040_MuskanPanwar_BankSprint1
             return true;
         }
 
-        // Abstract methods implemented in child classes
+       
         public abstract bool Withdraw(decimal amount);
         public abstract decimal CalculateInterest();
 
@@ -69,7 +69,7 @@ namespace _20240040_MuskanPanwar_BankSprint1
             return fee;
         }
 
-        // Formatted string with account info and status
+        
         public virtual string GetAccountInfo()
         {
             return "Account: " + accountNumber + " | Balance: $" + balance + " | Status: " + lastTransactionStatus;
