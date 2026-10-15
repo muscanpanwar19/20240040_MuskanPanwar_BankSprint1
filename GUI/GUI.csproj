@@ -49,8 +49,17 @@
     <Compile Include="..\20240040_MuskanPanwar_BankSprint1\Account.cs">
       <Link>Account.cs</Link>
     </Compile>
+    <Compile Include="..\20240040_MuskanPanwar_BankSprint1\BankingException.cs">
+      <Link>BankingException.cs</Link>
+    </Compile>
     <Compile Include="..\20240040_MuskanPanwar_BankSprint1\Customer.cs">
       <Link>Customer.cs</Link>
+    </Compile>
+    <Compile Include="..\20240040_MuskanPanwar_BankSprint1\CustomerController.cs">
+      <Link>CustomerController.cs</Link>
+    </Compile>
+    <Compile Include="..\20240040_MuskanPanwar_BankSprint1\CustomerType.cs">
+      <Link>CustomerType.cs</Link>
     </Compile>
     <Compile Include="..\20240040_MuskanPanwar_BankSprint1\EverydayAccount.cs">
       <Link>EverydayAccount.cs</Link>

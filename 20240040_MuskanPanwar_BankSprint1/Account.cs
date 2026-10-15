@@ -47,11 +47,11 @@ namespace _20240040_MuskanPanwar_BankSprint1
             if (amount <= 0)
             {
                 lastTransactionStatus = "Deposit Failed: Amount must be positive.";
-                return false;
+                throw new BankingException("Deposit failed: Amount must be positive.");
             }
 
             balance = balance + amount;
-            lastTransactionStatus = "Deposit Successful: $" + amount;
+            lastTransactionStatus = "Deposit Successful: $" + amount.ToString("F2");
             return true;
         }
 

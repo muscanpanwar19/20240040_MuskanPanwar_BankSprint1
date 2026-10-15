@@ -1,3 +1,5 @@
+using System;
+
 namespace _20240040_MuskanPanwar_BankSprint1
 {
     public class OmniAccount : Account
@@ -35,10 +37,16 @@ namespace _20240040_MuskanPanwar_BankSprint1
         // Withdrawal method (allows overdraft up to limit)
         public override bool Withdraw(decimal amount)
         {
+            if (amount <= 0)
+            {
+                lastTransactionStatus = "Withdrawal Failed: Amount must be positive.";
+                throw new BankingException("Withdrawal failed: Amount must be positive.", this, amount);
+            }
+
             if (amount <= (balance + overdraftLimit))
             {
                 balance -= amount;
-                lastTransactionStatus = "Withdrawal Successful: $" + amount;
+                lastTransactionStatus = "Withdrawal Successful: $" + amount.ToString("F2");
                 return true;
             }
             else
@@ -46,8 +54,13 @@ namespace _20240040_MuskanPanwar_BankSprint1
                 // Charge fee with 50% discount for bank staff
                 decimal fee = GetFee(failedFee);
                 balance -= fee;
-                lastTransactionStatus = "Withdrawal Failed: Overdraft exceeded. Fee charged: $" + fee;
-                return false;
+                lastTransactionStatus = "Withdrawal Failed: Overdraft exceeded. Fee charged: $" + fee.ToString("F2");
+                throw new InsufficientFundsException(
+                    "Omni Account withdrawal failed: Overdraft limit exceeded. Requested $" + 
+                    amount.ToString("F2") + ", but maximum available with overdraft limit of $" + 
+                    overdraftLimit.ToString("F2") + " was $" + (balance + overdraftLimit + fee).ToString("F2") + 
+                    ". A failed transaction fee of $" + fee.ToString("F2") + 
+                    " has been charged. Remaining balance is $" + balance.ToString("F2") + ".", this, amount);
             }
         }
 
@@ -55,9 +68,9 @@ namespace _20240040_MuskanPanwar_BankSprint1
         {
             if (balance > 1000)
             {
-                decimal interest = (balance - 1000) * (interestRate / 100);
+                decimal interest = Math.Round((balance - 1000) * (interestRate / 100), 2);
                 balance += interest;
-                lastTransactionStatus = "Interest added: $" + interest;
+                lastTransactionStatus = "Interest added: $" + interest.ToString("F2");
                 return interest;
             }
             else

@@ -1,3 +1,5 @@
+using System;
+
 namespace _20240040_MuskanPanwar_BankSprint1
 {
     // Everyday Account: No interest, no overdraft, no fees
@@ -12,16 +14,25 @@ namespace _20240040_MuskanPanwar_BankSprint1
         // Withdrawal method (no overdraft, no fees on failure)
         public override bool Withdraw(decimal amount)
         {
+            if (amount <= 0)
+            {
+                lastTransactionStatus = "Withdrawal Failed: Amount must be positive.";
+                throw new BankingException("Withdrawal failed: Amount must be positive.", this, amount);
+            }
+
             if (amount <= balance)
             {
                 balance -= amount;
-                lastTransactionStatus = "Withdrawal Successful: $" + amount;
+                lastTransactionStatus = "Withdrawal Successful: $" + amount.ToString("F2");
                 return true;
             }
             else
             {
                 lastTransactionStatus = "Withdrawal Failed: Insufficient Funds";
-                return false;
+                throw new InsufficientFundsException(
+                    "Everyday Account withdrawal failed: Insufficient funds. Requested $" + 
+                    amount.ToString("F2") + ", but available balance is $" + balance.ToString("F2") + 
+                    ". Overdraft is not permitted on Everyday Accounts.", this, amount);
             }
         }
 

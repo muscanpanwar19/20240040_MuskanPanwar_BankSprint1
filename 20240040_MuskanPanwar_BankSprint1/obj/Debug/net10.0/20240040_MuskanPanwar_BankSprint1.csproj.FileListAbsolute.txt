@@ -12,3 +12,4 @@ D:\20240040_MuskanPanwar_BankSprint1\20240040_MuskanPanwar_BankSprint1\obj\Debug
 D:\20240040_MuskanPanwar_BankSprint1\20240040_MuskanPanwar_BankSprint1\obj\Debug\net10.0\20240040_MuskanPanwar_BankSprint1.pdb
 D:\20240040_MuskanPanwar_BankSprint1\20240040_MuskanPanwar_BankSprint1\obj\Debug\net10.0\20240040_MuskanPanwar_BankSprint1.genruntimeconfig.cache
 D:\20240040_MuskanPanwar_BankSprint1\20240040_MuskanPanwar_BankSprint1\obj\Debug\net10.0\ref\20240040_MuskanPanwar_BankSprint1.dll
+D:\20240040_MuskanPanwar_BankSprint1\20240040_MuskanPanwar_BankSprint1\obj\Debug\net10.0\20240040_MuskanPanwar_BankSprint1.sourcelink.json
