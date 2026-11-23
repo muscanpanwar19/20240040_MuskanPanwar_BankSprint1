@@ -38,6 +38,7 @@ namespace GUI
             this.cboCustomers = new System.Windows.Forms.ComboBox();
             this.lblSelectCustomer = new System.Windows.Forms.Label();
             this.grpAccount = new System.Windows.Forms.GroupBox();
+            this.btnAddAccount = new System.Windows.Forms.Button();
             this.lblAccountRules = new System.Windows.Forms.Label();
             this.lblBalanceValue = new System.Windows.Forms.Label();
             this.lblBalanceHeader = new System.Windows.Forms.Label();
@@ -45,6 +46,7 @@ namespace GUI
             this.lblSelectAccount = new System.Windows.Forms.Label();
             this.cboAccounts = new System.Windows.Forms.ComboBox();
             this.grpTransactions = new System.Windows.Forms.GroupBox();
+            this.btnTransfer = new System.Windows.Forms.Button();
             this.lblStatusMessage = new System.Windows.Forms.Label();
             this.btnInterest = new System.Windows.Forms.Button();
             this.btnWithdraw = new System.Windows.Forms.Button();
@@ -52,6 +54,8 @@ namespace GUI
             this.txtAmount = new System.Windows.Forms.TextBox();
             this.lblAmount = new System.Windows.Forms.Label();
             this.grpHistory = new System.Windows.Forms.GroupBox();
+            this.btnReloadState = new System.Windows.Forms.Button();
+            this.btnSaveState = new System.Windows.Forms.Button();
             this.btnClearHistory = new System.Windows.Forms.Button();
             this.lstHistory = new System.Windows.Forms.ListBox();
             this.panelHeader.SuspendLayout();
@@ -106,9 +110,9 @@ namespace GUI
             this.lblTagline.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(148)))), ((int)(((byte)(163)))), ((int)(((byte)(184)))));
             this.lblTagline.Location = new System.Drawing.Point(18, 38);
             this.lblTagline.Name = "lblTagline";
-            this.lblTagline.Size = new System.Drawing.Size(370, 13);
+            this.lblTagline.Size = new System.Drawing.Size(465, 13);
             this.lblTagline.TabIndex = 1;
-            this.lblTagline.Text = "Sprint 2: MVC Customer Management & Hardened Banking Architecture";
+            this.lblTagline.Text = "Sprint 3: JSON Persistence | Form Inheritance | Intra-Account Transfers | Dynamic Accounts";
             // 
             // lblBrandLogo
             // 
@@ -315,6 +319,7 @@ namespace GUI
             // grpAccount
             // 
             this.grpAccount.BackColor = System.Drawing.Color.White;
+            this.grpAccount.Controls.Add(this.btnAddAccount);
             this.grpAccount.Controls.Add(this.lblAccountRules);
             this.grpAccount.Controls.Add(this.lblBalanceValue);
             this.grpAccount.Controls.Add(this.lblBalanceHeader);
@@ -328,7 +333,22 @@ namespace GUI
             this.grpAccount.Size = new System.Drawing.Size(550, 125);
             this.grpAccount.TabIndex = 2;
             this.grpAccount.TabStop = false;
-            this.grpAccount.Text = " Account Overview ";
+            this.grpAccount.Text = " Account Overview & Allocation ";
+            // 
+            // btnAddAccount
+            // 
+            this.btnAddAccount.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(253)))), ((int)(((byte)(244)))));
+            this.btnAddAccount.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(187)))), ((int)(((byte)(247)))), ((int)(((byte)(208)))));
+            this.btnAddAccount.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddAccount.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAddAccount.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(128)))), ((int)(((byte)(61)))));
+            this.btnAddAccount.Location = new System.Drawing.Point(410, 18);
+            this.btnAddAccount.Name = "btnAddAccount";
+            this.btnAddAccount.Size = new System.Drawing.Size(125, 26);
+            this.btnAddAccount.TabIndex = 6;
+            this.btnAddAccount.Text = "+ Add Account";
+            this.btnAddAccount.UseVisualStyleBackColor = false;
+            this.btnAddAccount.Click += new System.EventHandler(this.btnAddAccount_Click);
             // 
             // lblAccountRules
             // 
@@ -395,13 +415,14 @@ namespace GUI
             this.cboAccounts.FormattingEnabled = true;
             this.cboAccounts.Location = new System.Drawing.Point(120, 20);
             this.cboAccounts.Name = "cboAccounts";
-            this.cboAccounts.Size = new System.Drawing.Size(415, 21);
+            this.cboAccounts.Size = new System.Drawing.Size(280, 21);
             this.cboAccounts.TabIndex = 0;
             this.cboAccounts.SelectedIndexChanged += new System.EventHandler(this.cboAccounts_SelectedIndexChanged);
             // 
             // grpTransactions
             // 
             this.grpTransactions.BackColor = System.Drawing.Color.White;
+            this.grpTransactions.Controls.Add(this.btnTransfer);
             this.grpTransactions.Controls.Add(this.lblStatusMessage);
             this.grpTransactions.Controls.Add(this.btnInterest);
             this.grpTransactions.Controls.Add(this.btnWithdraw);
@@ -415,7 +436,22 @@ namespace GUI
             this.grpTransactions.Size = new System.Drawing.Size(550, 155);
             this.grpTransactions.TabIndex = 3;
             this.grpTransactions.TabStop = false;
-            this.grpTransactions.Text = " Transaction Controls (Exception Protected) ";
+            this.grpTransactions.Text = " Financial Operations & Intra-Account Transfers ";
+            // 
+            // btnTransfer
+            // 
+            this.btnTransfer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(249)))), ((int)(((byte)(255)))));
+            this.btnTransfer.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(186)))), ((int)(((byte)(230)))), ((int)(((byte)(253)))));
+            this.btnTransfer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTransfer.Font = new System.Drawing.Font("Segoe UI", 8.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnTransfer.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(3)))), ((int)(((byte)(105)))), ((int)(((byte)(161)))));
+            this.btnTransfer.Location = new System.Drawing.Point(280, 53);
+            this.btnTransfer.Name = "btnTransfer";
+            this.btnTransfer.Size = new System.Drawing.Size(255, 28);
+            this.btnTransfer.TabIndex = 6;
+            this.btnTransfer.Text = "⇄ Intra-Account Transfer...";
+            this.btnTransfer.UseVisualStyleBackColor = false;
+            this.btnTransfer.Click += new System.EventHandler(this.btnTransfer_Click);
             // 
             // lblStatusMessage
             // 
@@ -439,9 +475,9 @@ namespace GUI
             this.btnInterest.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(23)))), ((int)(((byte)(42)))));
             this.btnInterest.Location = new System.Drawing.Point(15, 53);
             this.btnInterest.Name = "btnInterest";
-            this.btnInterest.Size = new System.Drawing.Size(520, 28);
+            this.btnInterest.Size = new System.Drawing.Size(255, 28);
             this.btnInterest.TabIndex = 4;
-            this.btnInterest.Text = "% Calculate && Apply Interest";
+            this.btnInterest.Text = "% Apply Interest";
             this.btnInterest.UseVisualStyleBackColor = false;
             this.btnInterest.Click += new System.EventHandler(this.btnInterest_Click);
             // 
@@ -500,6 +536,8 @@ namespace GUI
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.grpHistory.BackColor = System.Drawing.Color.White;
+            this.grpHistory.Controls.Add(this.btnReloadState);
+            this.grpHistory.Controls.Add(this.btnSaveState);
             this.grpHistory.Controls.Add(this.btnClearHistory);
             this.grpHistory.Controls.Add(this.lstHistory);
             this.grpHistory.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -509,7 +547,39 @@ namespace GUI
             this.grpHistory.Size = new System.Drawing.Size(515, 504);
             this.grpHistory.TabIndex = 4;
             this.grpHistory.TabStop = false;
-            this.grpHistory.Text = " Activity & Audit Log (MVC Operations) ";
+            this.grpHistory.Text = " Activity & Audit Log (Persistence & MVC Operations) ";
+            // 
+            // btnReloadState
+            // 
+            this.btnReloadState.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnReloadState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+            this.btnReloadState.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(203)))), ((int)(((byte)(213)))), ((int)(((byte)(225)))));
+            this.btnReloadState.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnReloadState.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnReloadState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
+            this.btnReloadState.Location = new System.Drawing.Point(135, 465);
+            this.btnReloadState.Name = "btnReloadState";
+            this.btnReloadState.Size = new System.Drawing.Size(110, 28);
+            this.btnReloadState.TabIndex = 3;
+            this.btnReloadState.Text = "📂 Load JSON";
+            this.btnReloadState.UseVisualStyleBackColor = false;
+            this.btnReloadState.Click += new System.EventHandler(this.btnReloadState_Click);
+            // 
+            // btnSaveState
+            // 
+            this.btnSaveState.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnSaveState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(249)))), ((int)(((byte)(255)))));
+            this.btnSaveState.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(186)))), ((int)(((byte)(230)))), ((int)(((byte)(253)))));
+            this.btnSaveState.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSaveState.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSaveState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(3)))), ((int)(((byte)(105)))), ((int)(((byte)(161)))));
+            this.btnSaveState.Location = new System.Drawing.Point(15, 465);
+            this.btnSaveState.Name = "btnSaveState";
+            this.btnSaveState.Size = new System.Drawing.Size(110, 28);
+            this.btnSaveState.TabIndex = 2;
+            this.btnSaveState.Text = "💾 Save JSON";
+            this.btnSaveState.UseVisualStyleBackColor = false;
+            this.btnSaveState.Click += new System.EventHandler(this.btnSaveState_Click);
             // 
             // btnClearHistory
             // 
@@ -561,7 +631,8 @@ namespace GUI
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Nova Premier Bank - Sprint 2 (MVC Customer Management & Exception Handling)";
+            this.Text = "Nova Premier Bank — Sprint 3 (Data Persistence & Intra-Account Transfers)";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.panelHeader.ResumeLayout(false);
             this.panelHeader.PerformLayout();
@@ -605,15 +676,19 @@ namespace GUI
         private System.Windows.Forms.Label lblBalanceHeader;
         private System.Windows.Forms.Label lblBalanceValue;
         private System.Windows.Forms.Label lblAccountRules;
+        private System.Windows.Forms.Button btnAddAccount;
         private System.Windows.Forms.GroupBox grpTransactions;
         private System.Windows.Forms.Label lblAmount;
         private System.Windows.Forms.TextBox txtAmount;
         private System.Windows.Forms.Button btnDeposit;
         private System.Windows.Forms.Button btnWithdraw;
         private System.Windows.Forms.Button btnInterest;
+        private System.Windows.Forms.Button btnTransfer;
         private System.Windows.Forms.Label lblStatusMessage;
         private System.Windows.Forms.GroupBox grpHistory;
         private System.Windows.Forms.ListBox lstHistory;
         private System.Windows.Forms.Button btnClearHistory;
+        private System.Windows.Forms.Button btnSaveState;
+        private System.Windows.Forms.Button btnReloadState;
     }
 }

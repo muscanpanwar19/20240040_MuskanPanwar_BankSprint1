@@ -5,12 +5,17 @@ using _20240040_MuskanPanwar_BankSprint1;
 
 namespace GUI
 {
-    public partial class Form1 : Form
+    /// <summary>
+    /// Primary Application Window for Nova Premier Bank.
+    /// Demonstrates Form Inheritance by deriving from BaseBankForm.
+    /// Acts strictly as the View layer in the MVC architecture, delegating all operations to CustomerController.
+    /// </summary>
+    public partial class Form1 : BaseBankForm
     {
         // MVC Architecture: Form (View) only holds a reference to the Controller.
         // Direct storage or manipulation of List<Customer> is strictly prohibited inside the Form.
         private readonly CustomerController _controller;
-        private Customer _selectedCustomer;
+        private Customer? _selectedCustomer;
 
         public Form1()
         {
@@ -18,20 +23,91 @@ namespace GUI
             _controller = new CustomerController();
         }
 
+        // =========================================================================
+        // LIFECYCLE & DATA PERSISTENCE (TASK 5)
+        // =========================================================================
+
         private void Form1_Load(object sender, EventArgs e)
         {
-            AddHistoryLog("=== Nova Premier Bank System Initialized (Sprint 2 MVC) ===");
+            AddHistoryLog("=== Nova Premier Bank System Initialized (Sprint 3) ===");
+
+            // Task 5: Automatically trigger Load() during initial application startup
+            try
+            {
+                bool loaded = _controller.LoadFromFile();
+                if (loaded)
+                {
+                    AddHistoryLog($"[PERSISTENCE] System state loaded from '{_controller.PersistenceFilePath}' ({_controller.CustomerCount} customers restored).");
+                }
+                else
+                {
+                    AddHistoryLog($"[PERSISTENCE] No existing '{_controller.PersistenceFilePath}' detected. Seeded default demonstration customer records.");
+                }
+            }
+            catch (Exception ex)
+            {
+                AddHistoryLog($"[PERSISTENCE ERROR] Failed to load data file: {ex.Message}");
+                ShowError($"Failed to restore saved data: {ex.Message}\nStarting with default records.", "Persistence Warning");
+            }
+
             RefreshCustomerDropdown();
+        }
+
+        // Task 5: Automatically trigger Save() during FormClosing event
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                _controller.SaveToFile();
+                AddHistoryLog($"[PERSISTENCE AUTO-SAVE] Successfully saved {_controller.CustomerCount} customers to '{_controller.PersistenceFilePath}'.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to auto-save application state on exit:\n{ex.Message}", "Auto-Save Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnSaveState_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _controller.SaveToFile();
+                AddHistoryLog($"[MANUAL SAVE] Persisted {_controller.CustomerCount} customers to '{_controller.PersistenceFilePath}'.");
+                ShowSuccess($"All system records successfully serialized to '{_controller.PersistenceFilePath}'.", "Data Saved");
+            }
+            catch (Exception ex)
+            {
+                ShowError("Error saving system state: " + ex.Message, "Save Failed");
+            }
+        }
+
+        private void btnReloadState_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                bool ok = _controller.LoadFromFile();
+                if (ok)
+                {
+                    RefreshCustomerDropdown();
+                    AddHistoryLog($"[MANUAL LOAD] Reloaded {_controller.CustomerCount} customers from '{_controller.PersistenceFilePath}'.");
+                    ShowSuccess($"System state successfully reloaded ({_controller.CustomerCount} customers).", "Data Loaded");
+                }
+                else
+                {
+                    ShowWarning($"Persistence file '{_controller.PersistenceFilePath}' does not exist yet.", "File Not Found");
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError("Error reloading system state: " + ex.Message, "Load Failed");
+            }
         }
 
         // =========================================================================
         // CUSTOMER DATA BINDING & SELECTION (READ)
         // =========================================================================
 
-        /// <summary>
-        /// Refreshes the customer dropdown from the controller.
-        /// </summary>
-        private void RefreshCustomerDropdown(string selectCustomerNumber = null)
+        private void RefreshCustomerDropdown(string? selectCustomerNumber = null)
         {
             cboCustomers.Items.Clear();
 
@@ -83,13 +159,13 @@ namespace GUI
             if (customer == null) return;
 
             txtCustId.Text = customer.CustomerNumber;
-            txtCustId.ReadOnly = true; // Primary key cannot be altered during edit
+            txtCustId.ReadOnly = true; // Primary key locked during edit
             txtCustName.Text = customer.Name;
             txtCustContact.Text = customer.ContactDetails;
             chkCustStaff.Checked = customer.IsStaff;
 
             lblCustMessage.ForeColor = Color.FromArgb(71, 85, 105);
-            lblCustMessage.Text = $"Viewing record for {customer.Name} ({customer.CustomerNumber}).";
+            lblCustMessage.Text = $"Viewing record for {customer.Name} ({customer.CustomerNumber}). Total Accounts: {customer.Accounts.Count}.";
         }
 
         private void UpdateHeaderInfo()
@@ -110,10 +186,9 @@ namespace GUI
         }
 
         // =========================================================================
-        // CUSTOMER CRUD OPERATIONS (Routed through Controller)
+        // CUSTOMER CRUD OPERATIONS
         // =========================================================================
 
-        // CREATE: Add new customer
         private void btnCustCreate_Click(object sender, EventArgs e)
         {
             string id = txtCustId.Text.Trim();
@@ -133,23 +208,22 @@ namespace GUI
             }
             catch (ArgumentException ex)
             {
-                MessageBox.Show(ex.Message, "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                ShowWarning(ex.Message, "Validation Error");
                 lblCustMessage.ForeColor = Color.FromArgb(185, 28, 28);
                 lblCustMessage.Text = "Validation Failed: " + ex.Message;
             }
             catch (InvalidOperationException ex)
             {
-                MessageBox.Show(ex.Message, "Duplicate Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError(ex.Message, "Duplicate Error");
                 lblCustMessage.ForeColor = Color.FromArgb(185, 28, 28);
                 lblCustMessage.Text = ex.Message;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Unexpected error creating customer: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError("Unexpected error creating customer: " + ex.Message, "Error");
             }
         }
 
-        // UPDATE: Modify selected customer
         private void btnCustUpdate_Click(object sender, EventArgs e)
         {
             string id = txtCustId.Text.Trim();
@@ -159,7 +233,7 @@ namespace GUI
 
             if (string.IsNullOrWhiteSpace(id))
             {
-                MessageBox.Show("Please select a customer to update.", "Selection Required", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ShowWarning("Please select a customer to update.", "Selection Required");
                 return;
             }
 
@@ -175,18 +249,17 @@ namespace GUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError(ex.Message, "Update Error");
                 lblCustMessage.ForeColor = Color.FromArgb(185, 28, 28);
                 lblCustMessage.Text = "Update Failed: " + ex.Message;
             }
         }
 
-        // DELETE: Remove customer
         private void btnCustDelete_Click(object sender, EventArgs e)
         {
             if (_selectedCustomer == null)
             {
-                MessageBox.Show("Please select a customer to delete.", "Selection Required", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ShowWarning("Please select a customer to delete.", "Selection Required");
                 return;
             }
 
@@ -212,7 +285,6 @@ namespace GUI
             }
         }
 
-        // RESET / NEW FORM
         private void btnCustClear_Click(object sender, EventArgs e)
         {
             ClearCustomerFields();
@@ -231,23 +303,29 @@ namespace GUI
         }
 
         // =========================================================================
-        // ACCOUNT OVERVIEW & SELECTION
+        // ACCOUNT OVERVIEW, SELECTION & DYNAMIC ACCOUNT CREATION (TASK 3)
         // =========================================================================
 
-        private void PopulateAccountDropdown()
+        private void PopulateAccountDropdown(string? selectAccountNumber = null)
         {
             cboAccounts.Items.Clear();
             if (_selectedCustomer == null || _selectedCustomer.Accounts == null) return;
 
-            foreach (Account acc in _selectedCustomer.Accounts)
+            int selectedIndex = 0;
+            for (int i = 0; i < _selectedCustomer.Accounts.Count; i++)
             {
-                string typeName = acc.GetType().Name.Replace("Account", "");
-                cboAccounts.Items.Add($"{acc.AccountNumber} ({typeName})");
+                Account acc = _selectedCustomer.Accounts[i];
+                cboAccounts.Items.Add($"{acc.AccountNumber} ({acc.AccountType})");
+
+                if (selectAccountNumber != null && string.Equals(acc.AccountNumber, selectAccountNumber, StringComparison.OrdinalIgnoreCase))
+                {
+                    selectedIndex = i;
+                }
             }
 
             if (cboAccounts.Items.Count > 0)
             {
-                cboAccounts.SelectedIndex = 0;
+                cboAccounts.SelectedIndex = selectedIndex;
             }
             else
             {
@@ -255,7 +333,7 @@ namespace GUI
             }
         }
 
-        private Account GetSelectedAccount()
+        private Account? GetSelectedAccount()
         {
             if (_selectedCustomer == null) return null;
 
@@ -273,7 +351,7 @@ namespace GUI
 
         private void UpdateAccountDisplay()
         {
-            Account acc = GetSelectedAccount();
+            Account? acc = GetSelectedAccount();
             if (acc == null)
             {
                 ResetAccountDisplay();
@@ -289,15 +367,15 @@ namespace GUI
 
             if (acc is EverydayAccount)
             {
-                lblAccountRules.Text = "• Type: Everyday Account\n• Interest: 0% | Overdraft: $0.00 | Fee: $0.00\n• Pure checking account for daily expenses.";
+                lblAccountRules.Text = "• Type: Everyday Account\n• Interest: 0% | Overdraft: $0.00 | Fee: $0.00\n• Pure checking account for day-to-day transactions.";
             }
             else if (acc is InvestmentAccount inv)
             {
-                lblAccountRules.Text = $"• Type: Investment Account\n• Interest: {inv.InterestRate:F1}% on positive balance | Overdraft: $0.00\n• Failed Fee: ${inv.FailedFee:F2} (50% Staff Discount applies).";
+                lblAccountRules.Text = $"• Type: Investment Account\n• Interest: {inv.InterestRate:F1}% on positive balance | Overdraft: $0.00\n• Failed Fee: ${inv.FailedFee:F2} (50% Staff Discount applies: ${inv.FailedFee * 0.5m:F2}).";
             }
             else if (acc is OmniAccount omni)
             {
-                lblAccountRules.Text = $"• Type: Omni Account\n• Interest: {omni.InterestRate:F1}% on portion over $1,000 | Overdraft: ${omni.OverdraftLimit:F2}\n• Failed Fee: ${omni.FailedFee:F2} (50% Staff Discount applies).";
+                lblAccountRules.Text = $"• Type: Omni Account\n• Interest: {omni.InterestRate:F1}% on portion >$1,000 | Overdraft: ${omni.OverdraftLimit:F2}\n• Failed Fee: ${omni.FailedFee:F2} (50% Staff Discount applies: ${omni.FailedFee * 0.5m:F2}).";
             }
         }
 
@@ -310,28 +388,47 @@ namespace GUI
             lblStatusMessage.Text = "No active account.";
         }
 
+        // Task 3: Launch Dynamic Account Creation Form (Form Inheritance)
+        private void btnAddAccount_Click(object sender, EventArgs e)
+        {
+            if (_selectedCustomer == null)
+            {
+                ShowWarning("Please select an active customer first before creating an account.", "No Customer Selected");
+                return;
+            }
+
+            using (var form = new AddAccountForm(_controller, _selectedCustomer, () =>
+            {
+                PopulateAccountDropdown();
+                UpdateAccountDisplay();
+                AddHistoryLog($"[ACCOUNT CREATION] Successfully added account to {_selectedCustomer.Name}. Total: {_selectedCustomer.Accounts.Count}.");
+            }))
+            {
+                form.ShowDialog(this);
+            }
+        }
+
         // =========================================================================
-        // FINANCIAL TRANSACTIONS (Exception-Protected Business Logic)
+        // FINANCIAL TRANSACTIONS & INTRA-ACCOUNT MONEY TRANSFERS
         // =========================================================================
 
         private void btnDeposit_Click(object sender, EventArgs e)
         {
-            Account acc = GetSelectedAccount();
+            Account? acc = GetSelectedAccount();
             if (acc == null)
             {
-                MessageBox.Show("Please select an account first.", "No Account Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                ShowWarning("Please select an account first.", "No Account Selected");
                 return;
             }
 
             if (!decimal.TryParse(txtAmount.Text, out decimal amount))
             {
-                MessageBox.Show("Please enter a valid numeric transaction amount.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError("Please enter a valid numeric transaction amount.", "Invalid Input");
                 return;
             }
 
             try
             {
-                // Deposit routed through controller
                 _controller.Deposit(acc, amount);
 
                 UpdateAccountDisplay();
@@ -343,32 +440,31 @@ namespace GUI
                 lblStatusMessage.ForeColor = Color.FromArgb(185, 28, 28);
                 lblStatusMessage.Text = ex.Message;
                 AddHistoryLog($"[DEPOSIT ERROR] {acc.AccountNumber}: {ex.Message}");
-                MessageBox.Show(ex.Message, "Deposit Rejected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                ShowWarning(ex.Message, "Deposit Rejected");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Unexpected error during deposit: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError("Unexpected error during deposit: " + ex.Message, "Error");
             }
         }
 
         private void btnWithdraw_Click(object sender, EventArgs e)
         {
-            Account acc = GetSelectedAccount();
+            Account? acc = GetSelectedAccount();
             if (acc == null)
             {
-                MessageBox.Show("Please select an account first.", "No Account Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                ShowWarning("Please select an account first.", "No Account Selected");
                 return;
             }
 
             if (!decimal.TryParse(txtAmount.Text, out decimal amount))
             {
-                MessageBox.Show("Please enter a valid numeric transaction amount.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError("Please enter a valid numeric transaction amount.", "Invalid Input");
                 return;
             }
 
             try
             {
-                // Withdraw routed through controller; triggers custom exceptions on violation
                 _controller.Withdraw(acc, amount);
 
                 UpdateAccountDisplay();
@@ -377,37 +473,31 @@ namespace GUI
             }
             catch (InsufficientFundsException ex)
             {
-                UpdateAccountDisplay(); // Update display as fee may have been charged
+                UpdateAccountDisplay();
                 lblStatusMessage.ForeColor = Color.FromArgb(185, 28, 28);
                 lblStatusMessage.Text = ex.Message;
-                AddHistoryLog($"[INSUFFICIENT FUNDS EXCEPTION] {acc.AccountNumber}: {ex.Message}");
-
-                MessageBox.Show(
-                    ex.Message,
-                    "Transaction Declined - Insufficient Funds",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+                AddHistoryLog($"[INSUFFICIENT FUNDS] {acc.AccountNumber}: {ex.Message}");
+                ShowError(ex.Message, "Transaction Declined — Insufficient Funds");
             }
             catch (BankingException ex)
             {
                 lblStatusMessage.ForeColor = Color.FromArgb(185, 28, 28);
                 lblStatusMessage.Text = ex.Message;
                 AddHistoryLog($"[BANKING EXCEPTION] {acc.AccountNumber}: {ex.Message}");
-
-                MessageBox.Show(ex.Message, "Transaction Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                ShowWarning(ex.Message, "Transaction Error");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Unexpected error during withdrawal: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError("Unexpected error during withdrawal: " + ex.Message, "Error");
             }
         }
 
         private void btnInterest_Click(object sender, EventArgs e)
         {
-            Account acc = GetSelectedAccount();
+            Account? acc = GetSelectedAccount();
             if (acc == null)
             {
-                MessageBox.Show("Please select an account first.", "No Account Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                ShowWarning("Please select an account first.", "No Account Selected");
                 return;
             }
 
@@ -429,9 +519,39 @@ namespace GUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error calculating interest: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError("Error calculating interest: " + ex.Message, "Error");
             }
         }
+
+        // Task 4: Launch Dedicated Intra-Account Transfer Dialog (Form Inheritance)
+        private void btnTransfer_Click(object sender, EventArgs e)
+        {
+            if (_selectedCustomer == null)
+            {
+                ShowWarning("Please select an active customer first.", "No Customer Selected");
+                return;
+            }
+
+            if (_selectedCustomer.Accounts.Count < 2)
+            {
+                ShowWarning("This customer needs at least 2 accounts to perform an intra-account transfer.", "Insufficient Accounts");
+                return;
+            }
+
+            using (var transferForm = new TransferForm(_controller, _selectedCustomer, () =>
+            {
+                PopulateAccountDropdown();
+                UpdateAccountDisplay();
+                AddHistoryLog($"[INTRA-ACCOUNT TRANSFER] Completed money transfer for {_selectedCustomer.Name}.");
+            }))
+            {
+                transferForm.ShowDialog(this);
+            }
+        }
+
+        // =========================================================================
+        // AUDIT LOGGING & HELPERS
+        // =========================================================================
 
         private void AddHistoryLog(string message)
         {
