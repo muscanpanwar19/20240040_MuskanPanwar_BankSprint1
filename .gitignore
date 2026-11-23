@@ -1,0 +1,28 @@
+## Visual Studio / .NET .gitignore
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+
+# Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Tt]emp/
+[Tt]est[Rr]esults/
+
+# Dotnet artifacts
+*.deps.json
+*.runtimeconfig.json
+
+# Auto-generated files
+Generated Files/
+_ReSharper*/
+*.dotCover
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
